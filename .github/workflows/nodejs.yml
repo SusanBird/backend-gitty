@@ -21,3 +21,6 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           SALT_ROUNDS: ${{ secrets.SALT_ROUNDS }}
           COOKIE_NAME: ${{ secrets.COOKIE_NAME }}
+          GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
+          GITHUB_REDIRECT_URI: ${{ secrets.GITHUB_REDIRECT_URI }}
