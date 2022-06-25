@@ -5,5 +5,11 @@ DROP TABLE IF EXISTS github_users;
 CREATE TABLE github_users (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,    username TEXT NOT NULL, 
   email TEXT,
-  avatar TEXT
+  avatar TEXT,
+  post TEXT 
+)
+
+CREATE TABLE posts (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,    
+    post TEXT NOT NULL
 )
