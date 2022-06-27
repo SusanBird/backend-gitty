@@ -2,6 +2,7 @@ const pool = require('../lib/utils/pool');
 const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
+const Post = require('../lib/models/Post')
 
 jest.mock('../lib/services/github');
 
@@ -32,6 +33,27 @@ describe('github oauth routes', () => {
       iat: expect.any(Number),
       exp: expect.any(Number),
     });
+  });
+
+  it('/posts should return a list of posts', async () => {
+    const agent = await request.agent(app).get('/api/v1/github/callback?code=42');
+    const postData = Post.getAll();
+    const expected = (await postData).map((post) => {
+      return { id: post.id, post: post.post };
+    });
+
+    const res = await agent.get('/api/v1/posts');
+    expect(agent.body).toEqual(expected);
+  });
+
+  it('POST /posts should create a new post', async () => {
+    const agent = await (await request.agent(app).post('/posts')).setEncoding({
+      id: '4545',
+      post: 'the most secretest secret ever'
+    });
+    expect(agent.status).toEqual(200);
+    expect(agent.body.id).toEqual('4545');
+    expect(agent.body.post).toEqual('the most secretest secret ever')
   });
 
   afterAll(() => {
