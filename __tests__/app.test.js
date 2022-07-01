@@ -2,7 +2,7 @@ const pool = require('../lib/utils/pool');
 const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
-const Post = require('../lib/models/Post')
+const Post = require('../lib/models/Post');
 
 jest.mock('../lib/services/github');
 
@@ -19,7 +19,7 @@ describe('github oauth routes', () => {
     );
   });
 
-  it('should login and redirect users to /api/v1/github/dashboard', async () => {
+  it('should login and redirect users to /api/v1/github/callback', async () => {
     const res = await request
       .agent(app)
       .get('/api/v1/github/callback?code=42')
@@ -35,25 +35,27 @@ describe('github oauth routes', () => {
     });
   });
 
-  it('/posts should return a list of posts', async () => {
-    const agent = await request.agent(app).get('/api/v1/github/callback?code=42');
+  it('/api/v1/posts should return a list of posts', async () => {
+    const agent = request.agent(app);
+    await agent.get('/api/v1/github/callback?code=42');
     const postData = Post.getAll();
     const expected = (await postData).map((post) => {
       return { id: post.id, post: post.post };
     });
 
     const res = await agent.get('/api/v1/posts');
-    expect(agent.body).toEqual(expected);
+    expect(res.body).toEqual(expected);
   });
 
   it('POST /posts should create a new post', async () => {
-    const agent = await (await request.agent(app).post('/posts')).setEncoding({
-      id: '4545',
-      post: 'the most secretest secret ever'
+    const agent = request.agent(app);
+    await agent.get('/api/v1/github/callback?code=42');
+    const res = await agent.post('/api/v1/posts').send({
+      description: 'the most secretest secret ever'
     });
-    expect(agent.status).toEqual(200);
-    expect(agent.body.id).toEqual('4545');
-    expect(agent.body.post).toEqual('the most secretest secret ever')
+    expect(res.status).toEqual(200);
+    expect(res.body.id).toEqual('1');
+    expect(res.body.description).toEqual('the most secretest secret ever');
   });
 
   afterAll(() => {
